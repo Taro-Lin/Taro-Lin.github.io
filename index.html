@@ -585,7 +585,7 @@
         <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
           <div class="caller-avatar">📞</div>
           <div style="font-size:20px; font-weight:bold;">银行客服</div>
-          <div style="color:#666; margin-top:6px;">021-95599（伪造）</div>
+          <div style="color:#666; margin-top:6px;">099-95599（伪造）</div>
           <div class="call-tips">⚠️ 反诈提示：95599不会外呼要求转账/提供验证码</div>
           <div class="call-actions" id="callActions">
             <div class="call-btn btn-answer" data-action="answerCall">接听</div>
@@ -625,7 +625,6 @@
             <button class="pay-btn btn-confirm" data-action="confirmPay">确认支付</button>
           </div>
         </div>
-
         <!-- 验证码弹窗 -->
         <div class="verify-modal" id="verifyModal">
           <div class="verify-title">输入短信验证码</div>
@@ -633,7 +632,6 @@
           <button class="verify-btn" id="verifyBtn">确认验证</button>
         </div>
       </div>
-
       <!-- 笔记页面 -->
       <div class="page page-flex" id="notesScreen">
         <div class="notes-header">
@@ -687,13 +685,11 @@
         </div>
       </div>
     </div>
-
     <div class="screen-nav">
       <div class="nav-dot"></div>
     </div>
   </div>
 </div>
-
 <!-- 结果弹窗 -->
 <div class="result-modal" id="resultModal">
   <div class="modal-content">
@@ -705,7 +701,6 @@
     <button class="restart-btn" id="restartBtn">重新开始</button>
   </div>
 </div>
-
 <!-- 二维码 -->
 <div class="share-qrcode-modal" id="qrcodeModal">
   <div class="qrcode-box">
@@ -714,7 +709,6 @@
     <button class="qrcode-btn" id="closeQrcodeBtn">关闭</button>
   </div>
 </div>
-
 <script>
   // 核心配置（解耦硬编码）
   const config = {
@@ -732,7 +726,7 @@
       clickLink: { change: -30, desc: "点击钓鱼链接", tip: "⚠️ 高危操作！\n\n反诈知识点：此为钓鱼链接，农行官方信息仅通过95599/1069095599发送，切勿点击陌生链接。" },
       answerCall: { change: -20, desc: "接听诈骗电话", tip: "⚠️ 风险操作！\n\n反诈知识点：95599不会外呼要求转账/提供验证码，陌生“客服”来电务必挂断后拨打官方热线核实。" },
       hangupCall: { change: 10, desc: "挂断诈骗电话", tip: "✅ 正确操作！\n\n反诈知识点：挂断陌生可疑来电是防范电信诈骗的关键一步，切勿轻信“客服”“公检法”等陌生来电。" },
-      cancelPay: { change: 15, desc: "取消风险支付", tip: "✅ 支付已取消！\n\n反诈知识点：遇到风险提示务必停止支付，核实收款方身份后再操作。" },
+      cancelPay: { change: 20, desc: "取消风险支付", tip: "✅ 支付已取消！\n\n反诈知识点：遇到风险提示务必停止支付，核实收款方身份后再操作。" },
       confirmPay: { change: -40, desc: "确认风险支付", tip: "⚠️ 危险操作！\n\n反诈知识点：该收款账户存在非法集资风险，支付后资金可能无法追回。" }
     },
     // 积分等级配置
@@ -750,7 +744,7 @@
   // 状态管理（统一维护）
   const state = {
     currentStep: 1,
-    score: 100,
+    score: 60,
     scoreLog: [],
     operated: {
       sms: false,
@@ -774,7 +768,6 @@
       closeQrcodeBtn: document.getElementById('closeQrcodeBtn')
     }
   };
-
   // 工具函数
   const utils = {
     // 页面切换
@@ -809,24 +802,18 @@
       if (state.operated.sms && ['deleteSms', 'reportSms', 'clickLink'].includes(action)) return;
       if (state.operated.call && ['answerCall', 'hangupCall'].includes(action)) return;
       if (state.operated.pay && ['cancelPay', 'confirmPay'].includes(action)) return;
-
       const rule = config.scoreRules[action];
       if (!rule) return;
-
       // 计算新积分
       const oldScore = state.score;
       state.score += rule.change;
       state.score = Math.max(config.scoreMin, Math.min(config.scoreMax, state.score));
-
       // 记录日志
       state.scoreLog.push(`${rule.desc}：${oldScore} → ${state.score}（${rule.change > 0 ? '+' : ''}${rule.change}）`);
-
       // 更新展示
       this.updateScoreDisplay();
-
       // 操作反馈
       alert(`${rule.tip}\n当前积分：${state.score}分`);
-
       // 标记操作完成并隐藏小红点
       if (['deleteSms', 'reportSms', 'clickLink'].includes(action)) {
         state.operated.sms = true;
@@ -840,13 +827,10 @@
         state.operated.pay = true;
         this.hideBadge('bankIcon');
       }
-
       // 禁用对应操作按钮
       this.disableActions(action);
-
       // 推进步骤
       this.nextStep();
-
       // 支付操作直接展示结果
       if (['cancelPay', 'confirmPay'].includes(action)) {
         setTimeout(() => this.showResult(), 1000);
@@ -895,7 +879,7 @@
       // 展示最终积分
       state.els.finalScore.textContent = `${state.score}分`;
       // 展示积分明细
-      let detailHtml = '积分明细：初始100分<br>';
+      let detailHtml = '积分明细：初始60分<br>';
       state.scoreLog.forEach(log => {
         detailHtml += `${log}<br>`;
       });
@@ -912,7 +896,7 @@
     resetAll() {
       // 1. 重置核心数据状态
       state.currentStep = 1;
-      state.score = 100;
+      state.score = 60;
       state.scoreLog = [];
       state.operated = { sms: false, call: false, pay: false };
 
