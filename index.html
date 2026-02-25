@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>农行反诈实验室</title>
+  <title>农行反诈实验室 - 测试版</title>
   <meta name="author" content="温岭城西支行林昱丞">
   <script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
@@ -52,23 +52,54 @@
       padding: 0 14px;
       font-size: 12px;
     }
+    .step-tips {
+      position: absolute;
+      top: 36px;
+      left: 0;
+      right: 0;
+      height: 30px;
+      line-height: 30px;
+      background: #e8f4ff;
+      color: #0066cc;
+      font-size: 12px;
+      text-align: center;
+      z-index: 10;
+    }
+    .score-display {
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      font-size: 11px;
+      background: #0066cc;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
     .app-container {
       position: absolute;
       left: 0;
-      top: 36px;
+      top: 66px;
       right: 0;
       bottom: 50px;
       overflow: hidden;
       background: #f5f5f5;
     }
-    .home-screen, .sms-screen, .sms-detail, .call-screen, .pay-screen, .notes-screen {
+    /* 页面通用样式 */
+    .page {
       display: none;
       width: 100%;
       height: 100%;
       background: #fff;
     }
-    .home-screen {
+    .page.active {
       display: grid;
+    }
+    .page-flex.active {
+      display: flex;
+      flex-direction: column;
+    }
+    /* 桌面样式 */
+    .home-screen {
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(4, 1fr);
       gap: 8px;
@@ -81,6 +112,29 @@
       justify-content: center;
       padding: 6px;
       cursor: pointer;
+      position: relative;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    .app-icon.active {
+      opacity: 1;
+    }
+    .app-icon .badge {
+      position: absolute;
+      top: 0;
+      right: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ff3b30;
+      color: #fff;
+      font-size: 10px;
+      text-align: center;
+      line-height: 18px;
+      display: none;
+    }
+    .app-icon.has-badge .badge {
+      display: block;
     }
     .icon-circle {
       width: 48px;
@@ -95,32 +149,15 @@
       font-size: 11px;
       text-align: center;
     }
-    .sms-screen, .sms-detail, .call-screen, .pay-screen, .notes-screen {
-      flex-direction: column;
-    }
-    .sms-time {
-      font-size: 11px;
-      color: #999;
-      text-align: right;
-      margin-top: 2px;
-    }
-    .sms-header, .detail-header, .pay-header, .notes-header {
-      height: 42px;
-      display: flex;
-      align-items: center;
-      padding: 0 14px;
-      border-bottom: 1px solid #eee;
-      font-weight: bold;
-    }
-    .sms-list, .notes-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px;
-    }
+    /* 短信页面 */
     .sms-item {
       padding: 10px;
       border-bottom: 1px solid #f0f0f0;
       cursor: pointer;
+    }
+    .sms-item.fraud {
+      background: #fff8f8;
+      border-left: 3px solid #ff3b30;
     }
     .sms-sender {
       font-size: 14px;
@@ -133,6 +170,25 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+    .sms-time {
+      font-size: 11px;
+      color: #999;
+      text-align: right;
+      margin-top: 2px;
+    }
+    .sms-header, .detail-header, .call-header, .pay-header, .notes-header {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      border-bottom: 1px solid #eee;
+      font-weight: bold;
+    }
+    .sms-list, .notes-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
     }
     .sms-actions, .pay-actions {
       display: flex;
@@ -151,21 +207,20 @@
       color: #0066cc;
       font-size: 14px;
       cursor: pointer;
+      transition: all 0.2s;
     }
     .action-btn.primary {
       background: #0066cc;
       color: #fff;
     }
-    .pay-btn.btn-cancel {
+    .action-btn.disabled, .pay-btn.disabled {
+      opacity: 0.5;
+      pointer-events: none;
       background: #f2f2f2;
-      color: #333;
-      border: none;
+      border-color: #ddd;
+      color: #999;
     }
-    .pay-btn.btn-confirm {
-      background: #ff3b30;
-      color: #fff;
-      border: none;
-    }
+    /* 电话页面 */
     .call-screen {
       align-items: center;
       justify-content: center;
@@ -182,6 +237,13 @@
       font-size: 28px;
       margin-bottom: 16px;
     }
+    .call-tips {
+      color: #ff3b30;
+      font-size: 12px;
+      margin-top: 10px;
+      text-align: center;
+      padding: 0 20px;
+    }
     .call-actions {
       display: flex;
       gap: 30px;
@@ -195,6 +257,11 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    .call-btn.disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
     .btn-answer {
       background: #4cd964;
@@ -204,6 +271,39 @@
       background: #ff3b30;
       color: #fff;
     }
+    /* 通话内容弹窗 */
+    .call-dialog {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .call-dialog.active {
+      display: block;
+    }
+    .dialog-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .dialog-btn {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background: #0066cc;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    /* 支付页面 */
     .pay-content {
       padding: 20px;
       flex: 1;
@@ -236,6 +336,93 @@
       text-align: center;
       font-size: 18px;
     }
+    .pay-btn.btn-cancel {
+      background: #f2f2f2;
+      color: #333;
+      border: none;
+    }
+    .pay-btn.btn-confirm {
+      background: #ff3b30;
+      color: #fff;
+      border: none;
+    }
+    /* 验证码弹窗 */
+    .verify-modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+      display: none;
+    }
+    .verify-modal.active {
+      display: block;
+    }
+    .verify-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .verify-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 18px;
+      letter-spacing: 5px;
+    }
+    .verify-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #0066cc;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    /* 笔记页面 */
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+    }
+    .notes-back {
+      cursor: pointer;
+    }
+    .notes-title {
+      flex: 1;
+      text-align: center;
+      margin-left: -20px;
+    }
+    .notes-content {
+      padding: 16px;
+      line-height: 1.8;
+      font-size: 14px;
+      color: #333;
+    }
+    .notes-item {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .notes-item-title {
+      font-weight: bold;
+      color: #0066cc;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+    .notes-item-text {
+      color: #666;
+      text-indent: 2em;
+    }
+    /* 底部导航 */
     .screen-nav {
       position: absolute;
       bottom: 0;
@@ -254,6 +441,7 @@
       border-radius: 50%;
       background: #333;
     }
+    /* 结果弹窗 */
     .result-modal, .share-qrcode-modal {
       position: fixed;
       inset: 0;
@@ -262,6 +450,9 @@
       align-items: center;
       justify-content: center;
       z-index: 999;
+    }
+    .result-modal.active, .share-qrcode-modal.active {
+      display: flex;
     }
     .modal-content, .qrcode-box {
       background: #fff;
@@ -293,43 +484,6 @@
       background: #f2f2f2;
       color: #333;
     }
-    /* 笔记页面样式 */
-    .notes-header {
-      display: flex;
-      justify-content: space-between;
-    }
-    .notes-back {
-      cursor: pointer;
-    }
-    .notes-title {
-      flex: 1;
-      text-align: center;
-      margin-left: -20px;
-    }
-    .notes-content {
-      padding: 16px;
-      line-height: 1.8;
-      font-size: 14px;
-      color: #333;
-    }
-    .notes-item {
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .notes-item:last-child {
-      border-bottom: none;
-    }
-    .notes-item-title {
-      font-weight: bold;
-      color: #0066cc;
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
-    .notes-item-text {
-      color: #666;
-      text-indent: 2em;
-    }
   </style>
 </head>
 <body>
@@ -338,25 +492,32 @@
   <div class="phone-screen">
     <div class="screen-status">
       <span>10:38</span>
+      <span class="score-display" id="scoreDisplay">积分：100</span>
       <span>📶 🔋</span>
     </div>
 
+    <!-- 步骤提示栏 -->
+    <div class="step-tips" id="stepTips">当前步骤：1/3 - 处理诈骗短信（点击短信图标）</div>
+
     <div class="app-container">
       <!-- 桌面 -->
-      <div class="home-screen" id="homeScreen">
-        <div class="app-icon" onclick="openSms()">
+      <div class="page home-screen active" id="homeScreen">
+        <div class="app-icon active has-badge" id="smsIcon" data-page="smsScreen">
+          <div class="badge">1</div>
           <div class="icon-circle" style="background:#4cd964; color:#fff;">📱</div>
           <div class="icon-name">短信</div>
         </div>
-        <div class="app-icon" id="phoneIcon" style="opacity:0.5">
+        <div class="app-icon has-badge" id="phoneIcon" data-page="callScreen">
+          <div class="badge">1</div>
           <div class="icon-circle" style="background:#007aff; color:#fff;">📞</div>
           <div class="icon-name">电话</div>
         </div>
-        <div class="app-icon" id="bankIcon" style="opacity:0.5">
+        <div class="app-icon has-badge" id="bankIcon" data-page="payScreen">
+          <div class="badge">1</div>
           <div class="icon-circle" style="background:#ff2d55; color:#fff;">🏦</div>
           <div class="icon-name">手机银行</div>
         </div>
-        <div class="app-icon">
+        <div class="app-icon" data-page="notesScreen">
           <div class="icon-circle" style="background: #5856d6; color: #fff;">🌐</div>
           <div class="icon-name">浏览器</div>
         </div>
@@ -372,24 +533,24 @@
           <div class="icon-circle" style="background: #af52de; color: #fff;">🎮</div>
           <div class="icon-name">游戏</div>
         </div>
-        <div class="app-icon" onclick="openNotes()">
+        <div class="app-icon" data-page="notesScreen">
           <div class="icon-circle" style="background: #00c7be; color: #fff;">📝</div>
           <div class="icon-name">笔记</div>
         </div>
       </div>
 
       <!-- 短信列表 -->
-      <div class="sms-screen" id="smsScreen">
+      <div class="page page-flex" id="smsScreen">
         <div class="sms-header">短信</div>
         <div class="sms-list">
-          <div class="sms-item" onclick="openSmsDetail()">
-            <div class="sms-sender">106835921008320</div>
+          <div class="sms-item fraud" data-page="smsDetail">
+            <div class="sms-sender">106835921008320 <span style="color:#ff3b30; font-size:11px;">【诈骗预警】</span></div>
             <div class="sms-content">[农业银行]您好，我行授予您5000000元，点击链接查利息→http://abc315.help</div>
             <div class="sms-time">10:30</div>
           </div>
           <div class="sms-item">
             <div class="sms-sender">10086</div>
-            <div class="sms-content">【充值提醒】尊敬的客户：您好，03月15日您成功充值50.0元，当前您的充值账户余额为52.0元。您也可办理自动充值，减少停机风险： https://dx.10086.cn/b8cwCQ ，查费缴费敬请登录中国移动APP https://dx.10086.cn/A/0OJRFZRr [心级服务 让爱连接]【中国移动】</div>
+            <div class="sms-content">【充值提醒】尊敬的客户：您好，03月15日您成功充值50.0元，当前您的充值账户余额为52.0元。</div>
             <div class="sms-time">09:30</div>
           </div>
           <div class="sms-item">
@@ -401,60 +562,82 @@
       </div>
 
       <!-- 短信详情 -->
-      <div class="sms-detail" id="smsDetail">
+      <div class="page page-flex" id="smsDetail">
         <div class="detail-header">
-          <div onclick="backToList()">返回</div>
+          <div class="back-btn" data-page="smsScreen">返回</div>
         </div>
         <div style="padding:14px; font-size:15px; line-height:1.6;">
           [农业银行]您好，我行授予您5000000元，于03月28日停办，可用于日常消费，房屋装修，生意应急。点击链接查利息→http://abc315.help
+          <div style="margin-top:10px; padding:8px; background:#f8f8f8; border-radius:6px; font-size:12px; color:#ff3b30;">
+            ⚠️ 反诈提醒：农行官方不会通过非95599/1069095599号码发送贷款链接，此为诈骗短信！
+          </div>
         </div>
-        <div class="sms-actions">
-          <div class="action-btn" onclick="deleteSms()">删除</div>
-          <div class="action-btn" onclick="reportSms()">举报</div>
-          <div class="action-btn primary" onclick="clickLink()">点击链接</div>
+        <div class="sms-actions" id="smsActions">
+          <div class="action-btn" data-action="deleteSms">删除</div>
+          <div class="action-btn" data-action="reportSms">举报</div>
+          <div class="action-btn primary" data-action="clickLink">点击链接</div>
         </div>
       </div>
 
       <!-- 来电 -->
-      <div class="call-screen" id="callScreen">
-        <div class="caller-avatar">📞</div>
-        <div style="font-size:20px; font-weight:bold;">银行客服</div>
-        <div style="color:#666; margin-top:6px;">021-95599（伪造）</div>
-        <div class="call-actions">
-          <div class="call-btn btn-answer" onclick="answer()">接听</div>
-          <div class="call-btn btn-hangup" onclick="hangup()">挂断</div>
+      <div class="page page-flex" id="callScreen">
+        <div class="call-header"></div>
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div class="caller-avatar">📞</div>
+          <div style="font-size:20px; font-weight:bold;">银行客服</div>
+          <div style="color:#666; margin-top:6px;">021-95599（伪造）</div>
+          <div class="call-tips">⚠️ 反诈提示：95599不会外呼要求转账/提供验证码</div>
+          <div class="call-actions" id="callActions">
+            <div class="call-btn btn-answer" data-action="answerCall">接听</div>
+            <div class="call-btn btn-hangup" data-action="hangupCall">挂断</div>
+          </div>
+
+          <!-- 通话内容弹窗 -->
+          <div class="call-dialog" id="callDialog">
+            <div class="dialog-content" id="dialogContent">
+              客服：您好，我是农业银行客服，您的账户存在风险，需要您提供验证码进行安全验证，否则账户将被冻结...
+            </div>
+            <button class="dialog-btn" id="dialogBtn">我知道了</button>
+          </div>
         </div>
       </div>
 
       <!-- 支付 -->
-      <div class="pay-screen" id="payScreen">
+      <div class="page page-flex" id="payScreen">
         <div class="pay-header">确认支付</div>
         <div class="pay-content">
           <div class="pay-amount">¥5,000.00</div>
           <div style="color:#666">收款方：东方航空股份有限公司</div>
           <div class="risk-alert">
             <div style="color:#856404; font-weight:bold;">⚠️ 银行风险提示</div>
-            <div style="color:#721c24; font-size:13px; margin-top:4px;">该账户存在非法集资风险，请谨慎支付！</div>
+            <div style="color:#721c24; font-size:13px; margin-top:4px;">该账户存在非法集资风险，请谨慎支付！农行反诈热线：96110</div>
           </div>
           <div class="pwd-input">
-            <input type="password" class="pwd-digit" maxlength="1">
-            <input type="password" class="pwd-digit" maxlength="1">
-            <input type="password" class="pwd-digit" maxlength="1">
-            <input type="password" class="pwd-digit" maxlength="1">
-            <input type="password" class="pwd-digit" maxlength="1">
-            <input type="password" class="pwd-digit" maxlength="1">
+            <input type="password" class="pwd-digit" maxlength="1" data-index="0">
+            <input type="password" class="pwd-digit" maxlength="1" data-index="1">
+            <input type="password" class="pwd-digit" maxlength="1" data-index="2">
+            <input type="password" class="pwd-digit" maxlength="1" data-index="3">
+            <input type="password" class="pwd-digit" maxlength="1" data-index="4">
+            <input type="password" class="pwd-digit" maxlength="1" data-index="5">
           </div>
-          <div class="pay-actions">
-            <button class="pay-btn btn-cancel" onclick="cancelPay()">取消支付</button>
-            <button class="pay-btn btn-confirm" onclick="confirmPay()">确认支付</button>
+          <div class="pay-actions" id="payActions">
+            <button class="pay-btn btn-cancel" data-action="cancelPay">取消支付</button>
+            <button class="pay-btn btn-confirm" data-action="confirmPay">确认支付</button>
           </div>
+        </div>
+
+        <!-- 验证码弹窗 -->
+        <div class="verify-modal" id="verifyModal">
+          <div class="verify-title">输入短信验证码</div>
+          <input type="text" class="verify-input" id="verifyCode" maxlength="6" placeholder="6位数字验证码">
+          <button class="verify-btn" id="verifyBtn">确认验证</button>
         </div>
       </div>
 
       <!-- 笔记页面 -->
-      <div class="notes-screen" id="notesScreen">
+      <div class="page page-flex" id="notesScreen">
         <div class="notes-header">
-          <div class="notes-back" onclick="backToHome()">返回</div>
+          <div class="notes-back back-btn" data-page="homeScreen">返回</div>
           <div class="notes-title">消保注意事项</div>
           <div></div>
         </div>
@@ -516,9 +699,10 @@
   <div class="modal-content">
     <div style="font-size:20px; font-weight:bold; margin-bottom:10px;" id="resultTitle">反诈成功</div>
     <div style="color:#666; line-height:1.6;" id="resultMsg">你已成功识别诈骗！</div>
-    <div style="font-size:30px; font-weight:bold; color:#0066cc; margin:16px 0;" id="score">100分</div>
-    <button class="share-btn" onclick="showQrcode()">生成分享</button>
-    <button class="restart-btn" onclick="restart()">重新开始</button>
+    <div style="font-size:30px; font-weight:bold; color:#0066cc; margin:16px 0;" id="finalScore">100分</div>
+    <div style="font-size:12px; color:#999; margin-bottom:10px; text-align:left; line-height:1.5;" id="scoreDetail">积分明细：初始100分</div>
+    <button class="share-btn" id="shareBtn">生成分享</button>
+    <button class="restart-btn" id="restartBtn">重新开始</button>
   </div>
 </div>
 
@@ -527,148 +711,340 @@
   <div class="qrcode-box">
     <div style="font-weight:bold; margin-bottom:8px;">分享反诈实验室</div>
     <div id="qrcodeContainer" class="qrcode-img"></div>
-    <button class="qrcode-btn" onclick="closeQrcode()">关闭</button>
+    <button class="qrcode-btn" id="closeQrcodeBtn">关闭</button>
   </div>
 </div>
 
 <script>
-  let step = 1;
-  let score = 100;
+  // 核心配置（解耦硬编码）
+  const config = {
+    // 步骤配置
+    steps: [
+      { id: 1, name: "短信", tip: "当前步骤：1/3 - 处理诈骗短信（点击短信图标）", icon: "smsIcon" },
+      { id: 2, name: "电话", tip: "当前步骤：2/3 - 接听/挂断诈骗电话（点击电话图标）", icon: "phoneIcon" },
+      { id: 3, name: "支付", tip: "当前步骤：3/3 - 确认/取消风险支付（点击银行图标）", icon: "bankIcon" },
+      { id: 4, name: "完成", tip: "体验完成 - 查看你的反诈评分", icon: "" }
+    ],
+    // 积分规则配置
+    scoreRules: {
+      deleteSms: { change: 5, desc: "删除诈骗短信", tip: "✅ 短信已删除！\n\n反诈知识点：删除诈骗短信可避免误点，但举报能帮助拦截同类诈骗。" },
+      reportSms: { change: 10, desc: "举报诈骗短信", tip: "✅ 举报成功！\n\n反诈知识点：举报诈骗短信可帮助运营商拦截同类信息，保护更多人。" },
+      clickLink: { change: -30, desc: "点击钓鱼链接", tip: "⚠️ 高危操作！\n\n反诈知识点：此为钓鱼链接，农行官方信息仅通过95599/1069095599发送，切勿点击陌生链接。" },
+      answerCall: { change: -20, desc: "接听诈骗电话", tip: "⚠️ 风险操作！\n\n反诈知识点：95599不会外呼要求转账/提供验证码，陌生“客服”来电务必挂断后拨打官方热线核实。" },
+      hangupCall: { change: 10, desc: "挂断诈骗电话", tip: "✅ 正确操作！\n\n反诈知识点：挂断陌生可疑来电是防范电信诈骗的关键一步，切勿轻信“客服”“公检法”等陌生来电。" },
+      cancelPay: { change: 15, desc: "取消风险支付", tip: "✅ 支付已取消！\n\n反诈知识点：遇到风险提示务必停止支付，核实收款方身份后再操作。" },
+      confirmPay: { change: -40, desc: "确认风险支付", tip: "⚠️ 危险操作！\n\n反诈知识点：该收款账户存在非法集资风险，支付后资金可能无法追回。" }
+    },
+    // 积分等级配置
+    scoreLevels: [
+      { min: 90, title: "🎉 反诈王者", msg: "你精准识别所有骗局，安全意识极强！\n牢记“三不一多”，守护财产安全。" },
+      { min: 70, title: "👍 反诈合格", msg: "你识别了大部分骗局，但仍需提高警惕！\n陌生链接不点、陌生来电不信、不转账。" },
+      { min: 50, title: "⚠️ 反诈预警", msg: "你多次踩中诈骗陷阱，务必加强防范！\n遇可疑情况立即拨打96110反诈热线。" },
+      { min: 0, title: "🚨 高危风险", msg: "你的操作存在重大风险，极易被骗！\n立即学习反诈知识，保护自身财产安全。" }
+    ],
+    // 积分边界
+    scoreMin: 0,
+    scoreMax: 100
+  };
 
-  // 页面切换
-  function showPage(page) {
-    const pages = ['homeScreen','smsScreen','smsDetail','callScreen','payScreen','notesScreen'];
-    pages.forEach(id => {
-      const el = document.getElementById(id);
-      if(id === 'homeScreen'){
-        el.style.display = 'grid';
-      } else {
-        el.style.display = 'flex';
+  // 状态管理（统一维护）
+  const state = {
+    currentStep: 1,
+    score: 100,
+    scoreLog: [],
+    operated: {
+      sms: false,
+      call: false,
+      pay: false
+    },
+    // DOM缓存
+    els: {
+      scoreDisplay: document.getElementById('scoreDisplay'),
+      stepTips: document.getElementById('stepTips'),
+      resultModal: document.getElementById('resultModal'),
+      qrcodeModal: document.getElementById('qrcodeModal'),
+      callDialog: document.getElementById('callDialog'),
+      verifyModal: document.getElementById('verifyModal'),
+      resultTitle: document.getElementById('resultTitle'),
+      resultMsg: document.getElementById('resultMsg'),
+      finalScore: document.getElementById('finalScore'),
+      scoreDetail: document.getElementById('scoreDetail'),
+      restartBtn: document.getElementById('restartBtn'),
+      shareBtn: document.getElementById('shareBtn'),
+      closeQrcodeBtn: document.getElementById('closeQrcodeBtn')
+    }
+  };
+
+  // 工具函数
+  const utils = {
+    // 页面切换
+    switchPage(targetId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      const target = document.getElementById(targetId);
+      if (target) target.classList.add('active');
+    },
+    // 更新积分展示
+    updateScoreDisplay() {
+      state.els.scoreDisplay.textContent = `积分：${state.score}`;
+    },
+    // 更新步骤提示
+    updateStepTips() {
+      const stepConfig = config.steps.find(s => s.id === state.currentStep);
+      if (stepConfig) state.els.stepTips.textContent = stepConfig.tip;
+    },
+    // 隐藏对应图标的小红点
+    hideBadge(iconId) {
+      const icon = document.getElementById(iconId);
+      if (icon) icon.classList.remove('has-badge');
+    },
+    // 显示对应图标的小红点
+    showBadge(iconId) {
+      const icon = document.getElementById(iconId);
+      if (icon) icon.classList.add('has-badge');
+    },
+    // 调整积分（带边界控制）
+    adjustScore(action) {
+      if (state.operated.sms && ['deleteSms', 'reportSms', 'clickLink'].includes(action)) return;
+      if (state.operated.call && ['answerCall', 'hangupCall'].includes(action)) return;
+      if (state.operated.pay && ['cancelPay', 'confirmPay'].includes(action)) return;
+
+      const rule = config.scoreRules[action];
+      if (!rule) return;
+
+      // 计算新积分
+      const oldScore = state.score;
+      state.score += rule.change;
+      state.score = Math.max(config.scoreMin, Math.min(config.scoreMax, state.score));
+
+      // 记录日志
+      state.scoreLog.push(`${rule.desc}：${oldScore} → ${state.score}（${rule.change > 0 ? '+' : ''}${rule.change}）`);
+
+      // 更新展示
+      this.updateScoreDisplay();
+
+      // 操作反馈
+      alert(`${rule.tip}\n当前积分：${state.score}分`);
+
+      // 标记操作完成并隐藏小红点
+      if (['deleteSms', 'reportSms', 'clickLink'].includes(action)) {
+        state.operated.sms = true;
+        this.hideBadge('smsIcon');
       }
-      if(id !== page) el.style.display = 'none';
+      if (['answerCall', 'hangupCall'].includes(action)) {
+        state.operated.call = true;
+        this.hideBadge('phoneIcon');
+      }
+      if (['cancelPay', 'confirmPay'].includes(action)) {
+        state.operated.pay = true;
+        this.hideBadge('bankIcon');
+      }
+
+      // 禁用对应操作按钮
+      this.disableActions(action);
+
+      // 推进步骤
+      this.nextStep();
+
+      // 支付操作直接展示结果
+      if (['cancelPay', 'confirmPay'].includes(action)) {
+        setTimeout(() => this.showResult(), 1000);
+      } else {
+        // 自动返回首页
+        setTimeout(() => this.switchPage('homeScreen'), 1500);
+      }
+    },
+    // 推进下一步
+    nextStep() {
+      if (state.currentStep < 3) {
+        state.currentStep++;
+        this.updateStepTips();
+        // 激活下一个图标并确保小红点显示
+        const nextStepConfig = config.steps.find(s => s.id === state.currentStep);
+        if (nextStepConfig && nextStepConfig.icon) {
+          const icon = document.getElementById(nextStepConfig.icon);
+          if (icon) {
+            icon.classList.add('active');
+            this.showBadge(nextStepConfig.icon);
+          }
+        }
+      }
+    },
+    // 禁用操作按钮
+    disableActions(action) {
+      let containerId = '';
+      if (['deleteSms', 'reportSms', 'clickLink'].includes(action)) containerId = 'smsActions';
+      if (['answerCall', 'hangupCall'].includes(action)) containerId = 'callActions';
+      if (['cancelPay', 'confirmPay'].includes(action)) containerId = 'payActions';
+
+      if (containerId) {
+        const container = document.getElementById(containerId);
+        if (container) {
+          container.querySelectorAll('.action-btn, .pay-btn, .call-btn').forEach(btn => {
+            btn.classList.add('disabled');
+          });
+        }
+      }
+    },
+    // 展示结果
+    showResult() {
+      state.currentStep = 4;
+      this.updateStepTips();
+      state.els.resultModal.classList.add('active');
+      // 展示最终积分
+      state.els.finalScore.textContent = `${state.score}分`;
+      // 展示积分明细
+      let detailHtml = '积分明细：初始100分<br>';
+      state.scoreLog.forEach(log => {
+        detailHtml += `${log}<br>`;
+      });
+      state.els.scoreDetail.innerHTML = detailHtml;
+      // 匹配积分等级
+      const level = config.scoreLevels.find((level, index) => {
+        const nextLevel = config.scoreLevels[index + 1];
+        return state.score >= level.min && (!nextLevel || state.score < nextLevel.min);
+      }) || config.scoreLevels[config.scoreLevels.length - 1];
+      state.els.resultTitle.textContent = level.title;
+      state.els.resultMsg.textContent = level.msg;
+    },
+    // 重置所有状态（核心修复）
+    resetAll() {
+      // 1. 重置核心数据状态
+      state.currentStep = 1;
+      state.score = 100;
+      state.scoreLog = [];
+      state.operated = { sms: false, call: false, pay: false };
+
+      // 2. 重置UI展示
+      this.updateScoreDisplay();
+      this.updateStepTips();
+      this.switchPage('homeScreen');
+
+      // 3. 隐藏所有弹窗（必做，防止遮罩层残留）
+      state.els.resultModal.classList.remove('active');
+      state.els.qrcodeModal.classList.remove('active');
+      state.els.callDialog.classList.remove('active');
+      state.els.verifyModal.classList.remove('active');
+
+      // 4. 启用所有操作按钮
+      document.querySelectorAll('.action-btn, .pay-btn, .call-btn').forEach(btn => {
+        btn.classList.remove('disabled');
+      });
+
+      // 5. 重置图标状态（核心修复：按ID精准控制，避免循环疏漏）
+      // 先重置所有图标为初始状态
+      document.querySelectorAll('.app-icon').forEach(icon => {
+        icon.classList.remove('active', 'has-badge');
+        icon.style.opacity = '0.5'; // 强制恢复初始透明度
+      });
+      // 短信图标：激活+显示小红点
+      const smsIcon = document.getElementById('smsIcon');
+      smsIcon.classList.add('active', 'has-badge');
+      smsIcon.style.opacity = '1';
+      // 电话、银行图标：仅显示小红点
+      document.getElementById('phoneIcon').classList.add('has-badge');
+      document.getElementById('bankIcon').classList.add('has-badge');
+
+      // 6. 清空所有输入框内容
+      document.querySelectorAll('.pwd-digit, #verifyCode').forEach(input => {
+        input.value = '';
+        input.blur(); // 失焦，防止光标残留
+      });
+
+      // 7. 移除所有一次性事件的残留绑定（防止事件叠加）
+      const dialogBtn = document.getElementById('dialogBtn');
+      const verifyBtn = document.getElementById('verifyBtn');
+      dialogBtn.onclick = null;
+      verifyBtn.onclick = null;
+    },
+    // 生成二维码
+    generateQrcode() {
+      state.els.qrcodeModal.classList.add('active');
+      document.getElementById('qrcodeContainer').innerHTML = '';
+      new QRCode(document.getElementById('qrcodeContainer'), {
+        text: window.location.href,
+        width: 180,
+        height: 180
+      });
+    }
+  };
+
+  // 事件绑定（核心修复：直接绑定缓存的DOM元素，避免委托失效）
+  function bindEvents() {
+    // 页面切换事件（委托保留，兼容动态元素）
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-page]');
+      if (target) {
+        const targetPage = target.getAttribute('data-page');
+        // 步骤校验
+        if (['smsScreen', 'callScreen', 'payScreen'].includes(targetPage)) {
+          const targetStep = { smsScreen: 1, callScreen: 2, payScreen: 3 }[targetPage];
+          if (state.currentStep !== targetStep) {
+            alert(`请按步骤操作：当前应完成第${state.currentStep}步（${config.steps[state.currentStep - 1].name}）`);
+            return;
+          }
+        }
+        utils.switchPage(targetPage);
+      }
     });
-  }
 
-  // 笔记页面相关函数
-  function openNotes() {
-    showPage('notesScreen');
-  }
-
-  function backToHome() {
-    showPage('homeScreen');
-  }
-
-  // 短信
-  function openSms() {
-    showPage('smsScreen');
-  }
-  function backToList() {
-    showPage('smsScreen');
-  }
-  function openSmsDetail() {
-    showPage('smsDetail');
-  }
-
-  function deleteSms() {
-    alert('✅ 短信已删除！\n\n提示：删除可避免误点，但举报更有意义。');
-    unlockPhone();
-  }
-  function reportSms() {
-    alert('✅ 举报成功！\n\n提示：举报可帮助拦截同类诈骗，保护更多人。');
-    unlockPhone();
-  }
-  function clickLink() {
-    alert('⚠️ 这是钓鱼链接，可能导致信息泄露。农行信息认准 95599 和 （10）69095599 。');
-    unlockPhone();
-  }
-
-  // 解锁电话
-  function unlockPhone() {
-    step = 2;
-    document.getElementById('phoneIcon').style.opacity = 1;
-    document.getElementById('phoneIcon').onclick = openCall;
-    showPage('homeScreen');
-  }
-
-  // 电话
-  function openCall() {
-    if(step < 2) {
-      alert('请先完成短信体验');
-      return;
-    }
-    showPage('callScreen');
-  }
-  function answer() {
-    alert('⚠️ 你接听了诈骗电话！\n\n诈骗分子会诱导你转账，切记：客服不会要验证码！');
-    unlockBank();
-  }
-  function hangup() {
-    alert('✅ 果断挂断！\n\n提示：陌生客服来电，挂断后拨打官方热线核实最安全。');
-    unlockBank();
-  }
-
-  // 解锁银行
-  function unlockBank() {
-    step = 3;
-    document.getElementById('bankIcon').style.opacity = 1;
-    document.getElementById('bankIcon').onclick = openPay;
-    showPage('homeScreen');
-  }
-
-  // 支付
-  function openPay() {
-    if(step < 3) {
-      alert('请先完成电话体验');
-      return;
-    }
-    showPage('payScreen');
-  }
-  function cancelPay() {
-    score = 100;
-    showResult();
-  }
-  function confirmPay() {
-    score = 40;
-    showResult();
-  }
-
-  // 结果
-  function showResult() {
-    document.getElementById('resultModal').style.display = 'flex';
-    document.getElementById('score').innerText = score + '分';
-    if(score >= 80) {
-      document.getElementById('resultTitle').innerText = '🎉 反诈王者';
-      document.getElementById('resultMsg').innerText = '你精准识别所有骗局，安全意识极强！';
-    } else {
-      document.getElementById('resultTitle').innerText = '⚠️ 注意风险';
-      document.getElementById('resultMsg').innerText = '你差点被骗！记住：陌生链接不点、陌生电话不信、不转账！';
-    }
-  }
-
-  // 二维码
-  function showQrcode() {
-    document.getElementById('qrcodeModal').style.display = 'flex';
-    document.getElementById('qrcodeContainer').innerHTML = '';
-    new QRCode(document.getElementById('qrcodeContainer'), {
-      text: window.location.href,
-      width: 180,
-      height: 180
+    // 操作事件（委托保留）
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (target) {
+        const action = target.getAttribute('data-action');
+        // 接听电话特殊处理
+        if (action === 'answerCall') {
+          state.els.callDialog.classList.add('active');
+          document.getElementById('dialogBtn').onclick = () => {
+            state.els.callDialog.classList.remove('active');
+            utils.adjustScore(action);
+          };
+          return;
+        }
+        // 确认支付特殊处理
+        if (action === 'confirmPay') {
+          state.els.verifyModal.classList.add('active');
+          document.getElementById('verifyBtn').onclick = () => {
+            state.els.verifyModal.classList.remove('active');
+            utils.adjustScore(action);
+          };
+          return;
+        }
+        // 普通操作
+        utils.adjustScore(action);
+      }
     });
-  }
-  function closeQrcode() {
-    document.getElementById('qrcodeModal').style.display = 'none';
+
+    // 密码输入自动聚焦
+    document.querySelectorAll('.pwd-digit').forEach(input => {
+      input.addEventListener('input', function() {
+        if (this.value.length === 1) {
+          const nextIndex = parseInt(this.getAttribute('data-index')) + 1;
+          const nextInput = document.querySelector(`.pwd-digit[data-index="${nextIndex}"]`);
+          if (nextInput) nextInput.focus();
+        }
+      });
+    });
+
+    // 核心弹窗事件：直接绑定（修复无反应关键）
+    state.els.shareBtn.onclick = utils.generateQrcode;
+    state.els.restartBtn.onclick = () => utils.resetAll(); // 箭头函数保留this指向
+    state.els.closeQrcodeBtn.onclick = () => {
+      state.els.qrcodeModal.classList.remove('active');
+    };
   }
 
-  // 重启
-  function restart() {
-    step = 1;
-    score = 100;
-    document.getElementById('phoneIcon').style.opacity = 0.5;
-    document.getElementById('bankIcon').style.opacity = 0.5;
-    document.getElementById('resultModal').style.display = 'none';
-    document.getElementById('qrcodeModal').style.display = 'none';
-    showPage('homeScreen');
+  // 初始化
+  function init() {
+    utils.updateScoreDisplay();
+    utils.updateStepTips();
+    bindEvents();
   }
+
+  // 启动应用
+  window.addEventListener('load', init);
 </script>
 </body>
 </html>
