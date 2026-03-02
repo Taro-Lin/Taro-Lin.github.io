@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>农行反诈实验室 - 测试版</title>
-  <meta name="author" content="温岭城西支行林昱丞">
+  <title>反诈实验室 - 测试版</title>
+  <meta name="author" content="林昱丞
   <script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     * {
@@ -545,7 +545,7 @@
         <div class="sms-list">
           <div class="sms-item fraud" data-page="smsDetail">
             <div class="sms-sender">106835921008320 <span style="color:#ff3b30; font-size:11px;">【诈骗预警】</span></div>
-            <div class="sms-content">[农业银行]您好，我行授予您5000000元，点击链接查利息→http://abc315.help</div>
+            <div class="sms-content">[xx银行]您好，我行授予您5000000元，点击链接查利息→http://abc315.help</div>
             <div class="sms-time">10:30</div>
           </div>
           <div class="sms-item">
@@ -555,7 +555,7 @@
           </div>
           <div class="sms-item">
             <div class="sms-sender">95599</div>
-            <div class="sms-content">【中国农业银行】您尾号7777账户03月15日09：30向林昱丞完成转支交易人民币-6000.00，余额0.00。</div>
+            <div class="sms-content">【中国xx银行】您尾号7777账户03月15日09：30向xxx完成转支交易人民币-6000.00，余额0.00。</div>
             <div class="sms-time">09:30</div>
           </div>
         </div>
@@ -567,9 +567,9 @@
           <div class="back-btn" data-page="smsScreen">返回</div>
         </div>
         <div style="padding:14px; font-size:15px; line-height:1.6;">
-          [农业银行]您好，我行授予您5000000元，于03月28日停办，可用于日常消费，房屋装修，生意应急。点击链接查利息→http://abc315.help
+          [xx银行]您好，我行授予您5000000元，于03月28日停办，可用于日常消费，房屋装修，生意应急。点击链接查利息→http://abc315.help
           <div style="margin-top:10px; padding:8px; background:#f8f8f8; border-radius:6px; font-size:12px; color:#ff3b30;">
-            ⚠️ 反诈提醒：农行官方不会通过非95599/1069095599号码发送贷款链接，此为诈骗短信！
+            ⚠️ 反诈提醒：官方银行不会通过非955xx/10690955xx号码发送贷款链接，此为诈骗短信！
           </div>
         </div>
         <div class="sms-actions" id="smsActions">
@@ -585,8 +585,8 @@
         <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
           <div class="caller-avatar">📞</div>
           <div style="font-size:20px; font-weight:bold;">银行客服</div>
-          <div style="color:#666; margin-top:6px;">099-95599（伪造）</div>
-          <div class="call-tips">⚠️ 反诈提示：95599不会外呼要求转账/提供验证码</div>
+          <div style="color:#666; margin-top:6px;">099-955xx（伪造）</div>
+          <div class="call-tips">⚠️ 反诈提示：955xx不会外呼要求转账/提供验证码</div>
           <div class="call-actions" id="callActions">
             <div class="call-btn btn-answer" data-action="answerCall">接听</div>
             <div class="call-btn btn-hangup" data-action="hangupCall">挂断</div>
@@ -607,7 +607,7 @@
         <div class="pay-header">确认支付</div>
         <div class="pay-content">
           <div class="pay-amount">¥5,000.00</div>
-          <div style="color:#666">收款方：东方航空股份有限公司</div>
+          <div style="color:#666">收款方：xx航空股份有限公司</div>
           <div class="risk-alert">
             <div style="color:#856404; font-weight:bold;">⚠️ 银行风险提示</div>
             <div style="color:#721c24; font-size:13px; margin-top:4px;">该账户存在非法集资风险，请谨慎支付！农行反诈热线：96110</div>
@@ -679,7 +679,7 @@
           <div class="notes-item">
             <div class="notes-item-title">其他</div>
             <div class="notes-item-text">
-              作者：温岭城西支行林昱丞。
+              作者：林昱丞。
             </div>
           </div>
         </div>
@@ -723,7 +723,7 @@
     scoreRules: {
       deleteSms: { change: 5, desc: "删除诈骗短信", tip: "✅ 短信已删除！\n\n反诈知识点：删除诈骗短信可避免误点，但举报能帮助拦截同类诈骗。" },
       reportSms: { change: 10, desc: "举报诈骗短信", tip: "✅ 举报成功！\n\n反诈知识点：举报诈骗短信可帮助运营商拦截同类信息，保护更多人。" },
-      clickLink: { change: -30, desc: "点击钓鱼链接", tip: "⚠️ 高危操作！\n\n反诈知识点：此为钓鱼链接，农行官方信息仅通过95599/1069095599发送，切勿点击陌生链接。" },
+      clickLink: { change: -30, desc: "点击钓鱼链接", tip: "⚠️ 高危操作！\n\n反诈知识点：此为钓鱼链接，xx官方信息仅通过955xx/10690955xx发送，切勿点击陌生链接。" },
       answerCall: { change: -20, desc: "接听诈骗电话", tip: "⚠️ 风险操作！\n\n反诈知识点：95599不会外呼要求转账/提供验证码，陌生“客服”来电务必挂断后拨打官方热线核实。" },
       hangupCall: { change: 10, desc: "挂断诈骗电话", tip: "✅ 正确操作！\n\n反诈知识点：挂断陌生可疑来电是防范电信诈骗的关键一步，切勿轻信“客服”“公检法”等陌生来电。" },
       cancelPay: { change: 20, desc: "取消风险支付", tip: "✅ 支付已取消！\n\n反诈知识点：遇到风险提示务必停止支付，核实收款方身份后再操作。" },
