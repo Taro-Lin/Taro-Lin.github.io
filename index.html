@@ -21,6 +21,8 @@
             --secondary-color: #c8102e;
             --success-color: #4caf50;
             --danger-color: #ef5350;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
             --light-bg: #f0f5ff;
             --white: #ffffff;
             --gray-light: #e5e5e5;
@@ -406,7 +408,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        /* 二维码分享弹窗 - 核心修复：二维码尺寸适配 */
+        /* 二维码分享弹窗 - 核心优化：自然布局+趣味标签 */
         .qrcode-modal{
             position:fixed;
             top:0;
@@ -427,14 +429,26 @@
         .qrcode-content{
             background: var(--white);
             border-radius: var(--radius-md);
-            padding: 30px 20px;
+            padding: 25px 20px;
             width:100%;
-            max-width:320px; /* 缩小适配小屏，让二维码居中无溢出 */
+            max-width:340px;
             text-align:center;
             box-shadow: 0 8px 30px rgba(0,0,0,0.2);
             position: relative;
             animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             touch-action: none;
+        }
+
+        /* 顶部装饰条 */
+        .qrcode-content::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
         }
 
         @keyframes modalPop {
@@ -453,29 +467,118 @@
             }
         }
 
-        /* 二维码容器核心修复：尺寸统一+居中+无溢出 */
+        /* 标题优化：更自然的表述 */
+        .share-header {
+            margin-bottom: 15px;
+        }
+
+        .share-title {
+            font-size: clamp(18px, 4vw, 20px);
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* 趣味标签 - 核心新增 */
+        .funny-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: clamp(13px, 3vw, 14px);
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 不同标签配色 */
+        .tag-god {
+            background: linear-gradient(135deg, #c8102e 0%, #e53935 100%);
+        }
+
+        .tag-expert {
+            background: linear-gradient(135deg, #0052d9 0%, #2196f3 100%);
+        }
+
+        .tag-pro {
+            background: linear-gradient(135deg, #4caf50 0%, #43a047 100%);
+        }
+
+        .tag-beginner {
+            background: linear-gradient(135deg, #ff9800 0%, #fb8c00 100%);
+        }
+
+        /* 分数展示区域 - 优化布局 */
+        .score-display {
+            margin-bottom: 20px;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8fbff 0%, #e8f4ff 100%);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0,82,217,0.1);
+        }
+
+        .score-desc {
+            font-size: clamp(14px, 3vw, 15px);
+            color: var(--gray-dark);
+            margin-bottom: 8px;
+        }
+
+        .score-value {
+            font-size: clamp(32px, 9vw, 40px);
+            color: var(--secondary-color);
+            font-weight: 700;
+            line-height: 1.1;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .score-unit {
+            font-size: clamp(16px, 4vw, 18px);
+            color: var(--gray-dark);
+            font-weight: 500;
+        }
+
+        /* 二维码容器 - 优化自然度 */
         .qrcode-box{
-            width: 180px; /* 与二维码生成尺寸一致，彻底解决大小不匹配 */
-            height: 180px;
+            width: 170px;
+            height: 170px;
             margin: 0 auto 20px;
-            border: 2px solid var(--gray-light);
-            padding: 8px;
+            padding: 10px;
             display:flex;
             align-items:center;
             justify-content:center;
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius-md);
             background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            /* 防止二维码溢出容器 */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--gray-light);
             overflow: hidden;
         }
 
-        .qrcode-tip{
+        /* 分享文案 - 更自然的引导 */
+        .share-desc {
             font-size: clamp(14px, 3.2vw, 15px);
             color: var(--text-color);
             margin-bottom: 25px;
             line-height: 1.6;
             font-weight: 500;
+        }
+
+        .share-highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 按钮组 - 新增再答一次按钮 */
+        .share-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .share-btn-group .btn {
+            flex: 1;
+            padding: 14px 0;
         }
 
         /* 结果弹窗优化 - 更有趣的视觉效果（手机端适配） */
@@ -774,13 +877,36 @@
     </div>
 </div>
 
-<!-- 分享二维码弹窗 -->
+<!-- 分享二维码弹窗 - 优化后：自然布局+趣味标签+再答按钮 -->
 <div class="qrcode-modal" id="qrcodeModal">
     <div class="qrcode-content">
-        <h3 class="modal-title">📢 分享答题活动</h3>
+        <!-- 优化标题区域 -->
+        <div class="share-header">
+            <h3 class="share-title">金融消保答题成绩单</h3>
+            <!-- 趣味标签（动态切换） -->
+            <div class="funny-tag" id="funnyTag">消保小达人</div>
+        </div>
+
+        <!-- 分数展示区域 -->
+        <div class="score-display">
+            <div class="score-desc">我的最终得分</div>
+            <div class="score-value" id="shareScore">0<span class="score-unit">分</span></div>
+        </div>
+
+        <!-- 二维码区域（优化尺寸和样式） -->
         <div class="qrcode-box" id="qrcodeBox"></div>
-        <p class="qrcode-tip">扫码参与金融消保答题<br>一起学习反诈防骗知识，赢取满分！</p>
-        <button class="btn btn-secondary" onclick="closeQrcodeModal()">关闭 ❌</button>
+
+        <!-- 自然引导文案 -->
+        <p class="share-desc">
+            扫码挑战同款答题，<br>
+            一起成为<span class="share-highlight">金融安全守护者</span>！
+        </p>
+
+        <!-- 核心新增：双按钮组（再答一次+关闭） -->
+        <div class="share-btn-group">
+            <button class="btn btn-primary" onclick="restartShareGame()">再答一次</button>
+            <button class="btn btn-secondary" onclick="closeQrcodeModal()">关闭</button>
+        </div>
     </div>
 </div>
 
@@ -1024,20 +1150,51 @@
         initGame();
     }
 
-    // 显示二维码分享弹窗
+    // 分享页重新答题（核心新增）
+    function restartShareGame() {
+        // 关闭分享弹窗
+        closeQrcodeModal();
+        // 隐藏分享按钮
+        document.getElementById('shareBtn').classList.remove('show');
+        // 初始化答题并保持在答题页
+        initGame();
+    }
+
+    // 显示二维码分享弹窗 - 核心优化：动态标签+分数同步
     function showQrcodeModal() {
         const qrcodeBox = document.getElementById('qrcodeBox');
-        qrcodeBox.innerHTML = ''; // 清空旧二维码，防止重叠
+        qrcodeBox.innerHTML = ''; // 清空旧二维码
         const currentUrl = window.location.href;
-        // 生成尺寸180px，与.qrcode-box的宽高完全一致，无缩放/溢出
+
+        // 生成二维码（尺寸优化，更自然）
         new QRCode(qrcodeBox, {
             text: currentUrl,
-            width: 180,
-            height: 180, // 显式设置高度，与宽度一致，保证二维码为正正方形
+            width: 150,
+            height: 150,
             colorDark: "#0052d9",
             colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H // 高容错率，扫码更灵敏
+            correctLevel: QRCode.CorrectLevel.H
         });
+
+        // 核心：同步得分
+        document.getElementById('shareScore').textContent = totalScore;
+
+        // 核心：根据分数区间设置趣味标签
+        const funnyTag = document.getElementById('funnyTag');
+        if (totalScore === 100) {
+            funnyTag.textContent = '金融安全大神';
+            funnyTag.className = 'funny-tag tag-god';
+        } else if (totalScore >= 80) {
+            funnyTag.textContent = '消保小能手';
+            funnyTag.className = 'funny-tag tag-expert';
+        } else if (totalScore >= 60) {
+            funnyTag.textContent = '消保达人';
+            funnyTag.className = 'funny-tag tag-pro';
+        } else {
+            funnyTag.textContent = '消保学习者';
+            funnyTag.className = 'funny-tag tag-beginner';
+        }
+
         document.getElementById('qrcodeModal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
         document.body.style.touchAction = 'none';
