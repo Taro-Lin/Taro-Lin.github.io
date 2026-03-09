@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>反诈实验室</title>
+  <title>反诈实验室 - 测试版</title>
   <meta name="author" content="林昱丞">
   <script src="https://cdn.bootcdn.net/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
@@ -528,15 +528,10 @@
       max-width: 300px;
       text-align: center;
     }
-    /* 修复二维码：固定正方形，无拉伸，居中显示 */
     .qrcode-img {
-      width: 160px !important;
-      height: 160px !important;
-      margin: 12px auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      object-fit: contain;
+      width: 180px;
+      height: 180px;
+      margin: 10px auto;
     }
     .share-btn, .restart-btn, .qrcode-btn {
       width: 100%;
@@ -554,40 +549,6 @@
     .restart-btn {
       background: #f2f2f2;
       color: #333;
-    }
-    /* 新增：称号样式 */
-    .rank-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 8px 0;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .rank-level-1 { color: #ff3b30; } /* 高危风险 */
-    .rank-level-2 { color: #ff9500; } /* 反诈预警 */
-    .rank-level-3 { color: #007aff; } /* 反诈合格 */
-    .rank-level-4 { color: #34c759; } /* 反诈王者 */
-    /* 二维码页面分数和称号 */
-    .qrcode-rank {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .qrcode-score {
-      font-size: 24px;
-      font-weight: 700;
-      color: #0066cc;
-      margin-bottom: 12px;
-    }
-    /* 动画效果 */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
   </style>
 </head>
@@ -771,7 +732,7 @@
             </div>
             <div class="notes-item">
               <div class="notes-item-title">三、安全使用电子银行</div>
-              <div class="text-justify">
+              <div class="notes-item-text">
                 安装正版杀毒软件并及时更新，不点击不明链接，不扫描来历不明的二维码。设置复杂的登录密码和支付密码，并定期更换。开通账户变动短信提醒，及时关注账户资金变动情况。
               </div>
             </div>
@@ -793,6 +754,8 @@
                 本反诈实验室仅用于反诈知识科普和宣传教育，所有场景均为模拟演示，不代表真实金融机构业务流程。请勿将本页面内容作为实际金融操作依据，如遇真实诈骗情况，请立即拨打110或96110报警。
               </div>
             </div>
+            <div class="notes-item">
+            </div>
           </div>
         </div>
       </div>
@@ -805,7 +768,7 @@
 <!-- 结果弹窗 -->
 <div class="result-modal" id="resultModal">
   <div class="modal-content">
-    <div class="rank-title" id="resultTitle">反诈成功</div>
+    <div style="font-size:20px; font-weight:bold; margin-bottom:10px;" id="resultTitle">反诈成功</div>
     <div style="color:#666; line-height:1.6;" id="resultMsg">你已成功识别诈骗！</div>
     <div style="font-size:30px; font-weight:bold; color:#0066cc; margin:16px 0;" id="finalScore">100分</div>
     <div style="font-size:12px; color:#999; margin-bottom:10px; text-align:left; line-height:1.5;" id="scoreDetail">积分明细：初始60分</div>
@@ -813,26 +776,25 @@
     <button class="restart-btn" id="restartBtn">重新开始</button>
   </div>
 </div>
-<!-- 二维码分享弹窗 -->
+<!-- 二维码 -->
 <div class="share-qrcode-modal" id="qrcodeModal">
   <div class="qrcode-box">
-    <div style="font-weight:bold; margin-bottom:8px;">反诈实验室</div>
-    <div class="qrcode-rank" id="qrcodeRank">反诈王者</div>
-    <div class="qrcode-score" id="qrcodeScore">100分</div>
+    <div style="font-weight:bold; margin-bottom:8px;">分享反诈实验室</div>
     <div id="qrcodeContainer" class="qrcode-img"></div>
     <button class="qrcode-btn" id="closeQrcodeBtn">关闭</button>
   </div>
 </div>
-
 <script>
   // 核心配置（解耦硬编码）
   const config = {
+    // 步骤配置
     steps: [
       { id: 1, name: "短信", tip: "当前步骤：1/3 - 处理诈骗短信（点击短信图标）", icon: "smsIcon" },
       { id: 2, name: "电话", tip: "当前步骤：2/3 - 接听/挂断诈骗电话（点击电话图标）", icon: "phoneIcon" },
       { id: 3, name: "支付", tip: "当前步骤：3/3 - 确认/取消风险支付（点击银行图标）", icon: "bankIcon" },
       { id: 4, name: "完成", tip: "体验完成 - 查看你的反诈评分", icon: "" }
     ],
+    // 积分规则配置
     scoreRules: {
       deleteSms: { change: 5, desc: "删除诈骗短信", tip: "✅ 短信已删除！\n\n反诈知识点：删除诈骗短信可避免误点，但举报能帮助拦截同类诈骗。" },
       reportSms: { change: 10, desc: "举报诈骗短信", tip: "✅ 举报成功！\n\n反诈知识点：举报诈骗短信可帮助运营商拦截同类信息，保护更多人。" },
@@ -842,21 +804,29 @@
       cancelPay: { change: 20, desc: "取消风险支付", tip: "✅ 支付已取消！\n\n反诈知识点：遇到风险提示务必停止支付，核实收款方身份后再操作。" },
       confirmPay: { change: -40, desc: "确认风险支付", tip: "⚠️ 危险操作！\n\n反诈知识点：该收款账户存在非法集资风险，支付后资金可能无法追回。" }
     },
+    // 积分等级配置
     scoreLevels: [
-      { min: 0, level: 1, title: "🚨 反诈萌新", color: "rank-level-1", msg: "你的操作存在重大风险，极易被骗！\n立即学习反诈知识，保护自身财产安全。" },
-      { min: 30, level: 2, title: "⚠️ 反诈卫士", color: "rank-level-2", msg: "你多次踩中诈骗陷阱，务必加强防范！\n遇可疑情况立即拨打96110反诈热线。" },
-      { min: 60, level: 3, title: "👍 反诈精英", color: "rank-level-3", msg: "你识别了大部分骗局，但仍需提高警惕！\n陌生链接不点、陌生来电不信、不转账。" },
-      { min: 90, level: 4, title: "🎉 反诈王者", color: "rank-level-4", msg: "你精准识别所有骗局，安全意识极强！\n牢记“三不一多”，守护财产安全。" }
+      { min: 0, title: "🚨 高危风险", msg: "你的操作存在重大风险，极易被骗！\n立即学习反诈知识，保护自身财产安全。" },
+      { min: 30, title: "⚠️ 反诈预警", msg: "你多次踩中诈骗陷阱，务必加强防范！\n遇可疑情况立即拨打96110反诈热线。" },
+      { min: 60, title: "👍 反诈合格", msg: "你识别了大部分骗局，但仍需提高警惕！\n陌生链接不点、陌生来电不信、不转账。" },
+      { min: 90, title: "🎉 反诈王者", msg: "你精准识别所有骗局，安全意识极强！\n牢记“三不一多”，守护财产安全。" }
     ],
+    // 积分边界
     scoreMin: 0,
     scoreMax: 100
   };
 
+  // 状态管理（统一维护）
   const state = {
     currentStep: 1,
     score: 60,
     scoreLog: [],
-    operated: { sms: false, call: false, pay: false },
+    operated: {
+      sms: false,
+      call: false,
+      pay: false
+    },
+    // DOM缓存
     els: {
       scoreDisplay: document.getElementById('scoreDisplay'),
       stepTips: document.getElementById('stepTips'),
@@ -873,14 +843,12 @@
       closeQrcodeBtn: document.getElementById('closeQrcodeBtn'),
       startPage: document.getElementById('startPage'),
       mainInterface: document.getElementById('mainInterface'),
-      startBtn: document.getElementById('startBtn'),
-      qrcodeRank: document.getElementById('qrcodeRank'),
-      qrcodeScore: document.getElementById('qrcodeScore'),
-      qrcodeContainer: document.getElementById('qrcodeContainer')
+      startBtn: document.getElementById('startBtn')
     }
   };
-
+  // 工具函数
   const utils = {
+    // 页面切换
     switchPage(targetId) {
       document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
@@ -888,33 +856,43 @@
       const target = document.getElementById(targetId);
       if (target) target.classList.add('active');
     },
+    // 更新积分展示
     updateScoreDisplay() {
       state.els.scoreDisplay.textContent = `积分：${state.score}`;
     },
+    // 更新步骤提示
     updateStepTips() {
       const stepConfig = config.steps.find(s => s.id === state.currentStep);
       if (stepConfig) state.els.stepTips.textContent = stepConfig.tip;
     },
+    // 隐藏对应图标的小红点
     hideBadge(iconId) {
       const icon = document.getElementById(iconId);
       if (icon) icon.classList.remove('has-badge');
     },
+    // 显示对应图标的小红点
     showBadge(iconId) {
       const icon = document.getElementById(iconId);
       if (icon) icon.classList.add('has-badge');
     },
+    // 调整积分（带边界控制）
     adjustScore(action) {
       if (state.operated.sms && ['deleteSms', 'reportSms', 'clickLink'].includes(action)) return;
       if (state.operated.call && ['answerCall', 'hangupCall'].includes(action)) return;
       if (state.operated.pay && ['cancelPay', 'confirmPay'].includes(action)) return;
       const rule = config.scoreRules[action];
       if (!rule) return;
+      // 计算新积分
       const oldScore = state.score;
       state.score += rule.change;
       state.score = Math.max(config.scoreMin, Math.min(config.scoreMax, state.score));
+      // 记录日志
       state.scoreLog.push(`${rule.desc}：${oldScore} → ${state.score}（${rule.change > 0 ? '+' : ''}${rule.change}）`);
+      // 更新展示
       this.updateScoreDisplay();
+      // 操作反馈
       alert(`${rule.tip}\n当前积分：${state.score}分`);
+      // 标记操作完成并隐藏小红点
       if (['deleteSms', 'reportSms', 'clickLink'].includes(action)) {
         state.operated.sms = true;
         this.hideBadge('smsIcon');
@@ -927,18 +905,24 @@
         state.operated.pay = true;
         this.hideBadge('bankIcon');
       }
+      // 禁用对应操作按钮
       this.disableActions(action);
+      // 推进步骤
       this.nextStep();
+      // 支付操作直接展示结果
       if (['cancelPay', 'confirmPay'].includes(action)) {
         setTimeout(() => this.showResult(), 1000);
       } else {
+        // 自动返回首页
         setTimeout(() => this.switchPage('homeScreen'), 1500);
       }
     },
+    // 推进下一步
     nextStep() {
       if (state.currentStep < 3) {
         state.currentStep++;
         this.updateStepTips();
+        // 激活下一个图标并确保小红点显示
         const nextStepConfig = config.steps.find(s => s.id === state.currentStep);
         if (nextStepConfig && nextStepConfig.icon) {
           const icon = document.getElementById(nextStepConfig.icon);
@@ -949,11 +933,13 @@
         }
       }
     },
+    // 禁用操作按钮
     disableActions(action) {
       let containerId = '';
       if (['deleteSms', 'reportSms', 'clickLink'].includes(action)) containerId = 'smsActions';
       if (['answerCall', 'hangupCall'].includes(action)) containerId = 'callActions';
       if (['cancelPay', 'confirmPay'].includes(action)) containerId = 'payActions';
+
       if (containerId) {
         const container = document.getElementById(containerId);
         if (container) {
@@ -963,138 +949,178 @@
         }
       }
     },
+    // 展示结果
     showResult() {
       state.currentStep = 4;
       this.updateStepTips();
       state.els.resultModal.classList.add('active');
+      // 展示最终积分
       state.els.finalScore.textContent = `${state.score}分`;
+      // 展示积分明细
       let detailHtml = '积分明细：初始60分<br>';
       state.scoreLog.forEach(log => {
         detailHtml += `${log}<br>`;
       });
       state.els.scoreDetail.innerHTML = detailHtml;
+      // 匹配积分等级
       const level = config.scoreLevels.find((level, index) => {
         const nextLevel = config.scoreLevels[index + 1];
         return state.score >= level.min && (!nextLevel || state.score < nextLevel.min);
       }) || config.scoreLevels[config.scoreLevels.length - 1];
-      state.els.resultTitle.className = `rank-title ${level.color}`;
       state.els.resultTitle.textContent = level.title;
       state.els.resultMsg.textContent = level.msg;
     },
-    // 修复二维码生成：固定正方形尺寸，与容器一致
-    generateQrcode() {
-      state.els.qrcodeContainer.innerHTML = '';
-      const level = config.scoreLevels.find((level, index) => {
-        const nextLevel = config.scoreLevels[index + 1];
-        return state.score >= level.min && (!nextLevel || state.score < nextLevel.min);
-      }) || config.scoreLevels[config.scoreLevels.length - 1];
-      state.els.qrcodeRank.className = `qrcode-rank ${level.color}`;
-      state.els.qrcodeRank.textContent = level.title;
-      state.els.qrcodeScore.textContent = `${state.score}分`;
-      const qrContent = `${window.location.href}?score=${state.score}&rank=${encodeURIComponent(level.title)}`;
-      // 关键修复：宽高设为160px，和容器完全一致，保证正方形
-      new QRCode(state.els.qrcodeContainer, {
-        text: qrContent,
-        width: 160,
-        height: 160,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-      state.els.qrcodeModal.classList.add('active');
-    },
+    // 重置所有状态（核心修复）
     resetAll() {
+      // 1. 重置核心数据状态
       state.currentStep = 1;
       state.score = 60;
       state.scoreLog = [];
       state.operated = { sms: false, call: false, pay: false };
+
+      // 2. 重置UI展示
       this.updateScoreDisplay();
       this.updateStepTips();
       this.switchPage('homeScreen');
+
+      // 3. 隐藏所有弹窗（必做，防止遮罩层残留）
       state.els.resultModal.classList.remove('active');
       state.els.qrcodeModal.classList.remove('active');
       state.els.callDialog.classList.remove('active');
       state.els.verifyModal.classList.remove('active');
+
+      // 4. 启用所有操作按钮
       document.querySelectorAll('.action-btn, .pay-btn, .call-btn').forEach(btn => {
         btn.classList.remove('disabled');
       });
+
+      // 5. 重置图标状态（核心修复：按ID精准控制，避免循环疏漏）
+      // 先重置所有图标为初始状态
       document.querySelectorAll('.app-icon').forEach(icon => {
         icon.classList.remove('active', 'has-badge');
-        icon.style.opacity = '0.5';
+        icon.style.opacity = '0.5'; // 强制恢复初始透明度
       });
+      // 短信图标：激活+显示小红点
       const smsIcon = document.getElementById('smsIcon');
       smsIcon.classList.add('active', 'has-badge');
       smsIcon.style.opacity = '1';
+      // 电话、银行图标：仅显示小红点
       document.getElementById('phoneIcon').classList.add('has-badge');
       document.getElementById('bankIcon').classList.add('has-badge');
+
+      // 6. 清空所有输入框内容
       document.querySelectorAll('.pwd-digit, #verifyCode').forEach(input => {
         input.value = '';
-        input.blur();
+        input.blur(); // 失焦，防止光标残留
       });
+
+      // 7. 移除所有一次性事件的残留绑定（防止事件叠加）
       const dialogBtn = document.getElementById('dialogBtn');
       const verifyBtn = document.getElementById('verifyBtn');
       dialogBtn.onclick = null;
       verifyBtn.onclick = null;
+
+      // 8. 重置到首页（开始页面）
       state.els.mainInterface.style.display = 'none';
       state.els.startPage.classList.add('active');
     },
-    initEvents() {
-      state.els.startBtn.addEventListener('click', () => {
-        state.els.startPage.classList.remove('active');
-        state.els.mainInterface.style.display = 'block';
+    // 生成二维码
+    generateQrcode() {
+      state.els.qrcodeModal.classList.add('active');
+      document.getElementById('qrcodeContainer').innerHTML = '';
+      new QRCode(document.getElementById('qrcodeContainer'), {
+        text: window.location.href,
+        width: 180,
+        height: 180
       });
-      document.querySelectorAll('.app-icon').forEach(icon => {
-        icon.addEventListener('click', () => {
-          const targetPage = icon.getAttribute('data-page');
-          if (targetPage) this.switchPage(targetPage);
-        });
-      });
-      document.querySelectorAll('.back-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const targetPage = btn.getAttribute('data-page');
-          if (targetPage) this.switchPage(targetPage);
-        });
-      });
-      document.querySelectorAll('.sms-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const targetPage = item.getAttribute('data-page');
-          if (targetPage) this.switchPage(targetPage);
-        });
-      });
-      document.querySelectorAll('[data-action]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const action = btn.getAttribute('data-action');
-          this.adjustScore(action);
-          if (action === 'answerCall') {
-            state.els.callDialog.classList.add('active');
-            document.getElementById('dialogBtn').addEventListener('click', () => {
-              state.els.callDialog.classList.remove('active');
-            });
-          }
-          if (action === 'confirmPay') {
-            state.els.verifyModal.classList.add('active');
-            document.getElementById('verifyBtn').addEventListener('click', () => {
-              state.els.verifyModal.classList.remove('active');
-            });
-          }
-        });
-      });
-      state.els.restartBtn.addEventListener('click', () => this.resetAll());
-      state.els.shareBtn.addEventListener('click', () => this.generateQrcode());
-      state.els.closeQrcodeBtn.addEventListener('click', () => {
-        state.els.qrcodeModal.classList.remove('active');
-      });
-      document.querySelectorAll('.pwd-digit').forEach((input, index) => {
-        input.addEventListener('input', () => {
-          if (input.value && index < 5) {
-            document.querySelectorAll('.pwd-digit')[index + 1].focus();
-          }
-        });
-      });
+    },
+    // 进入主界面
+    enterMainInterface() {
+      state.els.startPage.classList.remove('active');
+      state.els.mainInterface.style.display = 'block';
     }
   };
 
-  utils.initEvents();
+  // 事件绑定（核心修复：直接绑定缓存的DOM元素，避免委托失效）
+  function bindEvents() {
+    // 开始按钮事件
+    state.els.startBtn.onclick = () => {
+      utils.enterMainInterface();
+    };
+
+    // 页面切换事件（委托保留，兼容动态元素）
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-page]');
+      if (target) {
+        const targetPage = target.getAttribute('data-page');
+        // 步骤校验
+        if (['smsScreen', 'callScreen', 'payScreen'].includes(targetPage)) {
+          const targetStep = { smsScreen: 1, callScreen: 2, payScreen: 3 }[targetPage];
+          if (state.currentStep !== targetStep) {
+            alert(`请按步骤操作：当前应完成第${state.currentStep}步（${config.steps[state.currentStep - 1].name}）`);
+            return;
+          }
+        }
+        utils.switchPage(targetPage);
+      }
+    });
+
+    // 操作事件（委托保留）
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (target) {
+        const action = target.getAttribute('data-action');
+        // 接听电话特殊处理
+        if (action === 'answerCall') {
+          state.els.callDialog.classList.add('active');
+          document.getElementById('dialogBtn').onclick = () => {
+            state.els.callDialog.classList.remove('active');
+            utils.adjustScore(action);
+          };
+          return;
+        }
+        // 确认支付特殊处理
+        if (action === 'confirmPay') {
+          state.els.verifyModal.classList.add('active');
+          document.getElementById('verifyBtn').onclick = () => {
+            state.els.verifyModal.classList.remove('active');
+            utils.adjustScore(action);
+          };
+          return;
+        }
+        // 普通操作
+        utils.adjustScore(action);
+      }
+    });
+
+    // 密码输入自动聚焦
+    document.querySelectorAll('.pwd-digit').forEach(input => {
+      input.addEventListener('input', function() {
+        if (this.value.length === 1) {
+          const nextIndex = parseInt(this.getAttribute('data-index')) + 1;
+          const nextInput = document.querySelector(`.pwd-digit[data-index="${nextIndex}"]`);
+          if (nextInput) nextInput.focus();
+        }
+      });
+    });
+
+    // 核心弹窗事件：直接绑定（修复无反应关键）
+    state.els.shareBtn.onclick = utils.generateQrcode;
+    state.els.restartBtn.onclick = () => utils.resetAll(); // 箭头函数保留this指向
+    state.els.closeQrcodeBtn.onclick = () => {
+      state.els.qrcodeModal.classList.remove('active');
+    };
+  }
+
+  // 初始化
+  function init() {
+    utils.updateScoreDisplay();
+    utils.updateStepTips();
+    bindEvents();
+  }
+
+  // 启动应用
+  window.addEventListener('load', init);
 </script>
 </body>
 </html>
